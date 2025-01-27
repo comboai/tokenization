@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Combo AI Token Sale</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="icon" type="image/png" href="https://comboai.io/wp-content/uploads/2024/09/cropped-ComboAI-icon.png">
+  
+  <script>
+    window.NFTART_CONFIG = {
+      rpcEndpoint: "https://intensive-bold-sun.solana-mainnet.quiknode.pro/0b7b0ee558f474ec8a0cc09880dff70e0d6b588d",
+      network: "mainnet"
+    };
+  
+    // Intercept and redirect all HTTP calls
+    const originalFetch = window.fetch;
+    window.fetch = function(url, options) {
+      if (url && url.toString().includes('alchemy')) {
+        url = "https://intensive-bold-sun.solana-mainnet.quiknode.pro/0b7b0ee558f474ec8a0cc09880dff70e0d6b588d";
+      }
+      return originalFetch.call(this, url, options);
+    };
+  
+    // Intercept WebSocket connections
+    const OriginalWebSocket = window.WebSocket;
+    window.WebSocket = function(url, protocols) {
+      if (url && url.toString().includes('alchemy')) {
+        url = "wss://intensive-bold-sun.solana-mainnet.quiknode.pro/0b7b0ee558f474ec8a0cc09880dff70e0d6b588d";
+      }
+      return new OriginalWebSocket(url, protocols);
+    };
+    window.WebSocket.prototype = OriginalWebSocket.prototype;
+    
+    // Also override XMLHttpRequest
+    const originalXHROpen = XMLHttpRequest.prototype.open;
+    XMLHttpRequest.prototype.open = function(method, url, ...rest) {
+      if (url && url.toString().includes('alchemy')) {
+        url = "https://intensive-bold-sun.solana-mainnet.quiknode.pro/0b7b0ee558f474ec8a0cc09880dff70e0d6b588d";
+      }
+      return originalXHROpen.call(this, method, url, ...rest);
+    };
+  
+    // Override connection providers
+    window.solanaConnectionConfig = {
+      httpUrl: "https://intensive-bold-sun.solana-mainnet.quiknode.pro/0b7b0ee558f474ec8a0cc09880dff70e0d6b588d",
+      wsUrl: "wss://intensive-bold-sun.solana-mainnet.quiknode.pro/0b7b0ee558f474ec8a0cc09880dff70e0d6b588d"
+    };
+
+      // Add counter update functionality
+  async function updateMainCounter() {
+    const connection = new solanaWeb3.Connection(
+      "https://intensive-bold-sun.solana-mainnet.quiknode.pro/0b7b0ee558f474ec8a0cc09880dff70e0d6b588d",
+      "confirmed"
+    );
+
+    try {
+      const candyMachine = await metaplex
+        .candyMachines()
+        .findByAddress({ address: new solanaWeb3.PublicKey("A2yeQWfNeBjYT1QBZNeouTpqyL6FwL2Lydu3WgwxK2Pz") });
+
+      if (candyMachine) {
+        const mainCounter = document.querySelector("#total-tokens-sold");
+        if (mainCounter) {
+          mainCounter.textContent = candyMachine.itemsMinted.toString();
+        }
+      }
+    } catch (error) {
+      console.error("Error updating counter:", error);
+    }
+  }
+
+  // Update counter every 10 seconds
+  setInterval(updateMainCounter, 10000);
+  
+  // Update immediately when page loads
+  document.addEventListener("DOMContentLoaded", updateMainCounter);
+  </script>
+
+  <!-- OneMint SDK -->
+  <script async type="module" src="https://cdn.nft-generator.art/js-sdk/v1.5.8/index.js"></script>
+  <link rel="stylesheet" href="https://cdn.nft-generator.art/js-sdk/v1.5.8/style.css" type="text/css">
+  <meta name="nft-art-sol-presale" content="W10=">
+
+  <!-- Google Font -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- Inline CSS -->
+  <style>
+    body {
+      font-family: "Plus Jakarta Sans", Arial, Helvetica, sans-serif;
+      line-height: 1.6;
+      color: #ffffff;
+      background-color: #1a1b1e;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 40px;
+    }
+    .logo {
+      font-size: 28px;
+      font-weight: bold;
+      color: #8077f2;
+    }
+    .logo-image {
+      height: 40px;
+      width: auto;
+    }
+    h1 {
+      font-size: 48px;
+      margin-bottom: 30px;
+      text-align: center;
+      color: #8077f2;
+    }
+    .network-notice {
+      text-align: center;
+      margin-bottom: 30px;
+      background-color: #2c2d31;
+      padding: 15px;
+      border-radius: 10px;
+      color: #8077f2;
+    }
+    .progress-bar {
+      background-color: #2c2d31;
+      border-radius: 10px;
+      height: 20px;
+      margin-bottom: 10px;
+    }
+    .progress-fill {
+      background-color: #3bd5bf;
+      height: 100%;
+      width: 0%;
+      border-radius: 10px;
+    }
+    .tranche-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 30px;
+      margin-bottom: 60px;
+    }
+    .tranche-card {
+      background-color: #2c2d31;
+      border-radius: 10px;
+      padding: 20px;
+    }
+    .tranche-title {
+      font-size: 28px;
+      font-weight: bold;
+      margin-bottom: 20px;
+      color: #8077f2;
+    }
+    .tranche-volume {
+      font-size: 24px;
+      color: #ffffff;
+      margin-bottom: 15px;
+    }
+    .tranche-detail {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 15px;
+      padding: 8px 0;
+      border-bottom: 1px solid #3a3b3f;
+    }
+    .highlight {
+      color: #8077f2;
+    }
+    .mint-button-container {
+      margin-top: 20px;
+      width: 100%;
+    }
+    nftart-sol-mint-button {
+      --nftart-button-bg: #3bd5bf;
+      --nftart-button-color: white;
+      width: 100%;
+      display: block;
+    }
+    .bonus-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 30px;
+      margin-bottom: 60px;
+    }
+    .bonus-card {
+      background-color: #2c2d31;
+      border-radius: 10px;
+      padding: 20px;
+    }
+    .bonus-title {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 20px;
+      color: #8077f2;
+    }
+    .bonus-list {
+      list-style-type: none;
+      padding: 0;
+    }
+    .bonus-item {
+      margin-bottom: 15px;
+      padding-left: 20px;
+      position: relative;
+    }
+    .bonus-item::before {
+      content: "•";
+      color: #8077f2;
+      position: absolute;
+      left: 0;
+    }
+    .info-section {
+      margin-top: 60px;
+    }
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+    .info-card {
+      background-color: #2c2d31;
+      border-radius: 10px;
+      padding: 25px;
+    }
+    .info-title {
+      color: #8b8d9e;
+      font-size: 16px;
+      margin-bottom: 15px;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+    .info-value {
+      color: #ffffff;
+      font-size: 20px;
+    }
+    .social-section {
+      margin-top: 60px;
+      background-color: #2c2d31;
+      border-radius: 10px;
+      padding: 30px;
+    }
+    .social-title {
+      font-size: 32px;
+      color: #8077f2;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+    .social-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+    }
+    .social-link {
+      background-color: #3a3b3f;
+      border-radius: 8px;
+      padding: 15px 25px;
+      color: white;
+      text-decoration: none;
+      text-align: center;
+      transition: background-color 0.3s;
+    }
+    .social-link:hover {
+      background-color: #3bd5bf;
+    }
+    .tranche-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tranche-icon {
+  height: 24px;
+  width: auto;
+}
+
+/* Reduce font size for bonus and info sections by 15% */
+.bonus-item, .info-value {
+  font-size: 85%; /* 15% reduction */
+}
+
+.bonus-title, .info-title {
+  font-size: 20px; /* Reduced from 24px */
+}
+/* Default grid layout remains the same */
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-bottom: 40px;
+}
+
+/* Mobile-specific layout */
+@media screen and (max-width: 768px) {
+  .info-grid {
+    grid-template-columns: 1fr; /* Stack items vertically on mobile */
+  }
+
+  /* Special handling for restrictions card */
+  .info-grid:last-child {
+    grid-template-columns: 1fr;
+  }
+
+  /* Make restrictions card full width */
+  .info-card:last-child {
+    grid-column: 1;
+  }
+}
+@keyframes goldPulse {
+  0% {
+    color: #FFD700;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
+  }
+  50% {
+    color: #FFA500;
+    text-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+  }
+  100% {
+    color: #FFD700;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
+  }
+}
+
+.early-adopters-title {
+  animation: goldPulse 2s infinite;
+  font-weight: bold;
+  background: linear-gradient(to right, #FFD700, #FFA500);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  display: inline-block;
+}
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <!-- HEADER -->
+    <header class="header">
+      <div class="logo">Combo AI Token Sale</div>
+      <a href="https://comboai.io" target="_blank">
+        <img src="https://comboai.io/wp-content/uploads/2024/09/comboai-header-logo-1.png" alt="Combo AI" class="logo-image">
+      </a>
+    </header>
+
+    <div class="network-notice">
+      All purchases are made in Solana. Connect Phantom wallet to buy.
+    </div>
+
+    <h1>$COMBO Token Sale</h1>
+
+    <!-- PROGRESS BAR -->
+<div class="progress-bar">
+  <div class="progress-fill" id="progress-fill"></div>
+</div>
+<div style="display: flex; justify-content: space-between; font-size: 18px; margin-bottom: 40px;">
+  <span>Total tokens sold: <span id="total-tokens-sold">3</span></span>
+  <span>Total supply: 16,712</span>
+</div>
+
+    <!-- TRANCHE GRID -->
+    <div class="tranche-grid">
+      <!-- Tranche A -->
+      <div class="tranche-card">
+        <div class="tranche-header">
+          <div class="tranche-title">Tranche A</div>
+          <img src="https://comboai.io/wp-content/uploads/2024/09/cropped-ComboAI-icon.png" alt="Combo AI" class="tranche-icon">
+        </div>
+        <div class="tranche-volume">Volume: 2222 SOL</div>
+        <div class="tranche-detail">
+          <span>Price per $COMBO token</span>
+          <span>1.88 SOL</span>
+        </div>
+        <div class="tranche-detail">
+          <span>Number of tokens</span>
+          <span>4177</span>
+        </div>
+        <div class="tranche-detail">
+          <span>Dividend</span>
+          <span><span class="highlight">7%</span> annually</span>
+        </div>
+        <div class="tranche-detail">
+          <span>Principal return</span>
+          <span>After 5 years</span>
+        </div>
+        <div class="tranche-detail">
+          <span>Early Adopter Bonus</span>
+          <span><span class="highlight">8%</span> annually</span>
+        </div>
+        <div class="mint-button-container">
+          <nftart-sol-mint-button 
+            candyMachineId="A2yeQWfNeBjYT1QBZNeouTpqyL6FwL2Lydu3WgwxK2Pz" 
+            chainId="mainnet" 
+            rpcUrl="https://intensive-bold-sun.solana-mainnet.quiknode.pro/0b7b0ee558f474ec8a0cc09880dff70e0d6b588d"
+            wsUrl="wss://intensive-bold-sun.solana-mainnet.quiknode.pro/0b7b0ee558f474ec8a0cc09880dff70e0d6b588d"
+            forceCustomRpc="true"
+            disableAlchemy="true"
+            confirmLevel="confirmed"
+            commitment="confirmed"
+            timeoutInSeconds="60"
+          />
+        </div>
+      </div>
+
+      <!-- Tranche B -->
+      <div class="tranche-card">
+        <div class="tranche-header">
+          <div class="tranche-title">Tranche B</div>
+          <img src="https://comboai.io/wp-content/uploads/2024/09/cropped-ComboAI-icon.png" alt="Combo AI" class="tranche-icon">
+        </div>
+        <div class="tranche-volume">Volume: 2222 SOL</div>
+        <div class="tranche-detail">
+          <span>Price per $COMBO token</span>
+          <span>1.88 SOL</span>
+        </div>
+        <div class="tranche-detail">
+          <span>Number of tokens</span>
+          <span>4177</span>
+        </div>
+        <div class="tranche-detail">
+          <span>Yield</span>
+          <span><span class="highlight">140%</span> after 5 years</span>
+        </div>
+        <div class="tranche-detail">
+          <span>Payment</span>
+          <span>One-time (incl. principal)</span>
+        </div>
+        <div class="tranche-detail">
+          <span>Early Adopter Bonus</span>
+          <span><span class="highlight">146%</span> after 5 years</span>
+        </div>
+        <div class="mint-button-container">
+          <nftart-sol-mint-button 
+            candyMachineId="A2yeQWfNeBjYT1QBZNeouTpqyL6FwL2Lydu3WgwxK2Pz" 
+            chainId="mainnet"
+            rpcUrl="https://intensive-bold-sun.solana-mainnet.quiknode.pro/0b7b0ee558f474ec8a0cc09880dff70e0d6b588d"
+            wsUrl="wss://intensive-bold-sun.solana-mainnet.quiknode.pro/0b7b0ee558f474ec8a0cc09880dff70e0d6b588d"
+            forceCustomRpc="true"
+            disableAlchemy="true"
+            confirmLevel="confirmed"
+            commitment="confirmed"
+            timeoutInSeconds="60" 
+          />
+        </div>
+      </div>
+
+      <!-- Tranche C -->
+      <div class="tranche-card">
+        <div class="tranche-header">
+          <div class="tranche-title">Tranche C</div>
+          <img src="https://comboai.io/wp-content/uploads/2024/09/cropped-ComboAI-icon.png" alt="Combo AI" class="tranche-icon">
+        </div>
+        <div class="tranche-volume">Volume: 2222 SOL</div>
+        <div class="tranche-detail">
+          <span>Price per $COMBO token</span>
+          <span>1.88 SOL</span>
+        </div>
+        <div class="tranche-detail">
+          <span>Number of tokens</span>
+          <span>4177</span>
+        </div>
+        <div class="tranche-detail">
+          <span>Yield</span>
+          <span><span class="highlight">160%</span> after 7 years</span>
+        </div>
+        <div class="tranche-detail">
+          <span>Payment</span>
+          <span>One-time (incl. principal)</span>
+        </div>
+        <div class="tranche-detail">
+          <span>Early Adopter Bonus</span>
+          <span><span class="highlight">170%</span> after 7 years</span>
+        </div>
+        <div class="mint-button-container">
+          <nftart-sol-mint-button 
+            candyMachineId="A2yeQWfNeBjYT1QBZNeouTpqyL6FwL2Lydu3WgwxK2Pz" 
+            chainId="mainnet"
+            rpcUrl="https://intensive-bold-sun.solana-mainnet.quiknode.pro/0b7b0ee558f474ec8a0cc09880dff70e0d6b588d"
+            wsUrl="wss://intensive-bold-sun.solana-mainnet.quiknode.pro/0b7b0ee558f474ec8a0cc09880dff70e0d6b588d"
+            forceCustomRpc="true"
+            disableAlchemy="true"
+            confirmLevel="confirmed"
+            commitment="confirmed"
+            timeoutInSeconds="60" 
+          />
+        </div>
+      </div>
+
+      <!-- Tranche D -->
+      <div class="tranche-card">
+        <div class="tranche-header">
+          <div class="tranche-title">Tranche D</div>
+          <img src="https://comboai.io/wp-content/uploads/2024/09/cropped-ComboAI-icon.png" alt="Combo AI" class="tranche-icon">
+        </div>
+        <div class="tranche-volume">Volume: 2222 SOL</div>
+        <div class="tranche-detail">
+          <span>Price per $COMBO token</span>
+          <span>1.88 SOL</span>
+        </div>
+        <div class="tranche-detail">
+          <span>Number of tokens</span>
+          <span>4177</span>
+        </div>
+        <div class="tranche-detail">
+          <span>Dividend</span>
+          <span><span class="highlight">3.25%</span> semi-annually</span>
+        </div>
+        <div class="tranche-detail">
+          <span>Principal return</span>
+          <span>After 5 years</span>
+        </div>
+        <div class="tranche-detail">
+          <span>Early Adopter Bonus</span>
+          <span><span class="highlight">4%</span> semi-annually</span>
+        </div>
+        <div class="mint-button-container">
+          <nftart-sol-mint-button 
+            candyMachineId="A2yeQWfNeBjYT1QBZNeouTpqyL6FwL2Lydu3WgwxK2Pz" 
+            chainId="mainnet"
+            rpcUrl="https://intensive-bold-sun.solana-mainnet.quiknode.pro/0b7b0ee558f474ec8a0cc09880dff70e0d6b588d"
+            wsUrl="wss://intensive-bold-sun.solana-mainnet.quiknode.pro/0b7b0ee558f474ec8a0cc09880dff70e0d6b588d"
+            forceCustomRpc="true"
+            disableAlchemy="true"
+            confirmLevel="confirmed"
+            commitment="confirmed"
+            timeoutInSeconds="60" 
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- Bonus / Incentives -->
+    <div class="bonus-grid">
+      <!-- Volume Bonuses -->
+      <div class="bonus-card">
+        <h2 class="bonus-title">Volume Bonuses</h2>
+        <ul class="bonus-list">
+          <li class="bonus-item">Level 1 (1.88 SOL): Access to Level C benefits</li>
+          <li class="bonus-item">Level 2 (8 SOL): Access to Levels C + B benefits</li>
+          <li class="bonus-item">Level 3 (88 SOL): Access to Levels C + B + A benefits</li>
+          <li class="bonus-item">Level 4 (188 SOL): All benefits + Personal training with CEO</li>
+        </ul>
+      </div>
+
+      <!-- Experience-Based Incentives -->
+      <div class="bonus-card">
+        <h2 class="bonus-title">Experience-Based Incentives</h2>
+        <ul class="bonus-list">
+          <li class="bonus-item">
+            Level A: Exclusive access to AI-driven insights and predictive analytics
+          </li>
+          <li class="bonus-item">
+            Level B: VIP events and Q&A sessions with AI and sports analytics experts
+          </li>
+          <li class="bonus-item">
+            Level C: Access to community competitions and prediction contests
+          </li>
+        </ul>
+      </div>
+
+      <!-- Referral Program -->
+      <div class="bonus-card">
+        <h2 class="bonus-title">Referral Program</h2>
+        <ul class="bonus-list">
+          <li class="bonus-item">
+            Earn rewards for bringing new investors to the platform
+          </li>
+          <li class="bonus-item">
+            Receive a share of profits from referred investors' tokens
+          </li>
+          <li class="bonus-item">
+            For detailed information about our referral program, please visit our official channels
+          </li>
+        </ul>
+      </div>
+
+      <!-- Early Adopters Bonus -->
+      <div class="bonus-card">
+        <h2 class="bonus-title early-adopters-title">Early Adopters Bonus</h2>
+        <p style="margin-bottom: 15px;">
+          Purchase before March 9, 2025 to receive:
+        </p>
+        <ul class="bonus-list">
+          <li class="bonus-item">Tranche A: Increased annual dividend of 8%</li>
+          <li class="bonus-item">Tranche B: Enhanced yield of 146% after 5 years</li>
+          <li class="bonus-item">Tranche C: Boosted yield of 170% after 7 years</li>
+          <li class="bonus-item">Tranche D: Higher semi-annual dividend of 4%</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Info Section -->
+    <div class="info-section">
+      <div class="info-grid">
+        <div class="info-card">
+          <div class="info-title">Soft Cap</div>
+          <div class="info-value">2222 SOL</div>
+        </div>
+        <div class="info-card">
+          <div class="info-title">Hard Cap</div>
+          <div class="info-value">8888 SOL</div>
+        </div>
+        <div class="info-card">
+          <div class="info-title">Price</div>
+          <div class="info-value">1 $COMBO = 1.88 SOL</div>
+        </div>
+      </div>
+
+      <div class="info-grid">
+        <div class="info-card">
+          <div class="info-title">Presale</div>
+          <div class="info-value">Fair launch</div>
+        </div>
+        <div class="info-card">
+          <div class="info-title">Crowdsale</div>
+          <div class="info-value">January 7, 2024, 6:00 PM UTC</div>
+        </div>
+        <div class="info-card">
+          <div class="info-title">Restrictions</div>
+          <div class="info-value">USA, Mainland China, Cuba, Iran, North Korea, Syria, Crimea</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Social Section -->
+    <div class="social-section">
+      <h2 class="social-title">Official Channels</h2>
+      <div class="social-grid">
+        <a href="https://t.me/comboai_community" target="_blank" class="social-link">
+          Telegram Community
+        </a>
+        <a href="https://t.me/comboai_channel" target="_blank" class="social-link">
+          Telegram Channel
+        </a>
+        <a href="https://discord.gg/EukHw9XK" target="_blank" class="social-link">
+          Discord
+        </a>
+        <a href="https://x.com/comboai" target="_blank" class="social-link">
+          X (Twitter)
+        </a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
