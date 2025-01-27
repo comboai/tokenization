@@ -3,9 +3,7 @@
 
 <div align="center">
   <img src="https://comboai.io/wp-content/uploads/2024/09/comboai-header-logo-1.png" alt="ComboAI Logo" width="400"/>
-Show Image
-Show Image
-Show Image
+
 </div>
 Overview
 ComboAI is revolutionizing sports betting through the power of artificial intelligence and blockchain technology. Our platform combines cutting-edge AI algorithms with Solana blockchain integration to provide sophisticated sports predictions and analytics while offering innovative investment opportunities through our tranche-based tokenization model.
